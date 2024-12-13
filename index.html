@@ -1,0 +1,383 @@
+<html>
+    <head>
+        <title>My A-Frame Scene</title>
+        <script src="https://aframe.io/releases/0.7.0/aframe.min.js"></script>
+        <script src="https://unpkg.com/aframe-csg-meshs/index.js"></script>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background: linear-gradient(to bottom, #87CEEB, #f0f8ff); /* Fundo estilo céu */
+                margin: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+            }
+    
+            .button-container {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                align-items: center;
+            }
+    
+            .cloud-button {
+                background: linear-gradient(to bottom, #ffffff, #d3d3d3); /* Efeito de nuvem */
+                border: 2px solid #cccccc;
+                border-radius: 50px;
+                padding: 10px 20px;
+                font-size: 16px;
+                color: #555;
+                box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2); /* Sombra */
+                cursor: pointer;
+                transition: transform 0.2s, box-shadow 0.2s;
+            }
+    
+            .cloud-button:hover {
+                transform: translateY(-5px);
+                box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3); /* Sombra mais intensa no hover */
+            }
+    
+            .cloud-button:active {
+                transform: translateY(0px);
+                box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.2); /* Sombra reduzida no clique */
+            }
+    
+            .reset-button {
+                background: linear-gradient(to bottom, #1e90ff, #4682b4); /* Cor diferente para o botão de reset */
+                border: 2px solid #00f;
+                color: #fff;
+            }
+
+            .active-camera {
+                background: linear-gradient(to bottom, #32cd32, #228b22); /* Verde claro para indicar câmera ativa */
+                border: 2px solid #006400; /* Borda mais escura para a câmera ativa */
+                color: white;
+            }   
+            .bottom-left {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                font-size: 18px;
+                font-weight: bold;
+                color: #333;
+                z-index: 999;
+            }
+        </style>
+      </head>
+      
+      <body>
+        <div style="position: absolute; top: 10px; left: 10px; z-index: 999;">
+            <button class="cloud-button" id="button-camTopOfTab" onclick="activateCamera('camTopOfTab')">Top of Tab</button>
+            <button class="cloud-button" id="button-camBottomOfPieces" onclick="activateCamera('camBottomOfPieces')">Bottom of Pieces</button>
+            <button class="cloud-button" id="button-camTopOfScene" onclick="activateCamera('camTopOfScene')">Top of Scene</button>
+            <button class="cloud-button active-camera" id="button-camDiagonalFrontOfScene" onclick="activateCamera('camDiagonalFrontOfScene')">Diagonal Front of Scene</button>
+            <button class="cloud-button" id="button-camSideOfScene" onclick="activateCamera('camSideOfScene')">Side of Scene</button>
+            <button class="cloud-button" id="button-camDiagonalBackOfScene" onclick="activateCamera('camDiagonalBackOfScene')">Diagonal Back of Scene</button>
+            <button class="cloud-button reset-button" onclick="resetCameras()">Reset Cameras</button>
+        </div>
+
+        <div class="bottom-left">
+            The Falling Go
+        </div>
+        <a-scene>
+            <a-assets>
+                <img id="grass" src="./Grass0003_1_download600.jpg">
+                <img id="sky" src="./sky.jpg">
+            </a-assets>
+            
+            <a-sky src="#sky" radius="500" side="double"></a-sky>
+            
+            <a-plane material="color:#FFFFFF;
+             side:double;
+             src: #grass;
+             repeat:5 5;
+             normal-map: #grass;
+             normal-texture-repeat: 5 5
+             "  
+             position="0 -60 0" scale="1000 1000 1" rotation="90 0 0">
+
+            </a-plane>
+
+            <a-box id="tabuleiro" color="#C04000" depth="25" height="10" width="40" position="20 5 9" scale="1 1 1" 
+                    shadow csg-meshs="subtract: #gameCylinderL, #gameCylinderR"
+                    rotation="0 0 -45"
+                >
+                
+                <a-cylinder id="gameCylinderR" position="15 5 0" rotation="90" radius="2.5" height="15" color="#FFC65D" 
+                shadow csg-meshs="union: #gameCylinderRSphere1, #gameCylinderRSphere2" 
+                material="transparent: true; opacity: 0.0"
+                >
+                    <a-sphere id="gameCylinderRSphere1" position="0 -7.5 0" radius="2.5" color="#EF2D5E"  material="transparent: true; opacity: 0.0"></a-sphere>
+                    <a-sphere id="gameCylinderRSphere2" position="0 7.5 0" radius="2.5" color="#EF2D5E"  material="transparent: true; opacity: 0.0"></a-sphere>
+                </a-cylinder>
+
+                <a-cylinder id="gameCylinderL" position="-15 5 0" rotation="90" radius="2.5" height="15" color="#FFC65D" 
+                    shadow csg-meshs="union: #gameCylinderLSphere1, #gameCylinderLSphere2" 
+                    material="transparent: true; opacity: 0.0"
+                >
+                    <a-sphere id="gameCylinderLSphere1" position="0 -7.5 0" radius="2.5" color="#EF2D5E"  material="transparent: true; opacity: 0.0"></a-sphere>
+                    <a-sphere id="gameCylinderLSphere2" position="0 7.5 0" radius="2.5" color="#EF2D5E"  material="transparent: true; opacity: 0.0"></a-sphere>
+                </a-cylinder>
+
+                <a-box id="borderBoxOut" color="#b87333" depth="0.3" height="0.3" width="20.5" position="0 5 10.2" scale="1 1 1"></a-box>
+                <a-box id="borderBoxOut" color="#b87333" depth="0.3" height="0.3" width="24" position="0 5 12" scale="1 1 1"></a-box>
+
+                <a-box id="borderBoxOut" color="#b87333" depth="0.3" height="0.3" width="20.5" position="0 5 -10.2" scale="1 1 1"></a-box>
+                <a-box id="borderBoxOut" color="#b87333" depth="0.3" height="0.3" width="24" position="0 5 -12" scale="1 1 1"></a-box>
+
+                <a-box id="borderBoxOut" color="#b87333" depth="20.7" height="0.3" width="0.3" position="10.2 5 0" scale="1 1 1"></a-box>
+                <a-box id="borderBoxOut" color="#b87333" depth="24.3" height="0.3" width="0.3" position="12 5 0" scale="1 1 1"></a-box>
+
+                <a-box id="borderBoxOut" color="#b87333" depth="20.7" height="0.3" width="0.3" position="-10.2 5 0" scale="1 1 1"></a-box>
+                <a-box id="borderBoxOut" color="#b87333" depth="24.3" height="0.3" width="0.3" position="-12 5 0" scale="1 1 1"></a-box>
+            </a-box>
+
+
+            <a-box id="mesa" color="#deb887" depth="36" height="5" width="60" position="9 3 9" scale="1 1 1"  shadow
+            rotation="0 0 -45"
+            >
+                <a-cylinder id="cylinder1" position="-25 -30 13" radius="2.5" height="60" color="#deb887"></a-cylinder>
+                <a-cylinder id="cylinder2" position="-25 -30 -13" radius="2.5" height="60" color="#deb887"></a-cylinder>
+                <a-cylinder id="cylinder3" position="25 -30 13" radius="2.5" height="60" color="#deb887"></a-cylinder>
+                <a-cylinder id="cylinder4" position="25 -30 -13" radius="2.5" height="60" color="#deb887"></a-cylinder>
+                
+                <a-box color="#deb887" id="barUpper1" depth="2" height="2" width="50" position="0 -5 -13.3" scale="1 1 1"  shadow></a-box>
+                <a-box color="#deb887" id="barUpper2" depth="2" height="2" width="50" position="0 -5 13.3" scale="1 1 1"  shadow></a-box>
+                <a-box color="#deb887" id="barUpper3" depth="26" height="2" width="2" position="25 -5 0" scale="1 1 1"  shadow></a-box>
+                <a-box color="#deb887" id="barUpper4" depth="26" height="2" width="2" position="-25 -5 0" scale="1 1 1"  shadow></a-box>
+
+                <a-box color="#deb887" id="barUpper1" depth="2" height="2" width="50" position="0 -10 -13.3" scale="1 1 1"  shadow></a-box>
+                <a-box color="#deb887" id="barLower2" depth="2" height="2" width="50" position="0 -10 13.3" scale="1 1 1"  shadow></a-box>
+                <a-box color="#deb887" id="barLower3" depth="26" height="2" width="2" position="25 -10 0" scale="1 1 1"  shadow></a-box>
+                <a-box color="#deb887" id="barLower4" depth="26" height="2" width="2" position="-25 -10 0" scale="1 1 1"  shadow></a-box>
+
+                <a-cylinder id="cylinder1" position="-25 -61 13" radius="2.5" height="2" color="#deb887"></a-cylinder>
+                <a-cylinder id="cylinder2" position="-25 -61 -13" radius="2.5" height="2" color="#deb887"></a-cylinder>
+                <a-cylinder id="cylinder3" position="25 -61 13" radius="2.5" height="2" color="#deb887"></a-cylinder>
+                <a-cylinder id="cylinder4" position="25 -61 -13" radius="2.5" height="2" color="#deb887"></a-cylinder>
+            </a-box>
+
+            <a-entity position="50 30 10" rotation="-45 90 0">
+                <a-camera id="camTopOfTab" active="false"/>
+            </a-entity>
+
+            <a-entity position="50 -60 10" rotation="45 90 0">
+                <a-camera id="camBottomOfPieces" active="false"/>
+            </a-entity>
+            
+            <a-entity position="40 90 10" rotation="-90 0 0">
+                <a-camera id="camTopOfScene" active="false"/>
+            </a-entity>
+
+            <a-entity position="90 30 90" rotation="-30 45 0">
+                <a-camera id="camDiagonalFrontOfScene" active="true"/>
+            </a-entity>
+
+            <a-entity position="30 -15 100" rotation="0 -10 0">
+                <a-camera id="camSideOfScene" active="false"/>
+            </a-entity>
+
+            <a-entity position="-60 30 -50" rotation="-40 -120 0">
+                <a-camera id="camDiagonalBackOfScene" active="false"/>
+            </a-entity>
+
+        </a-scene>
+        <script>
+                function activateCamera(cameraId) {
+                    // Desativa todas as câmeras
+                    const cameras = document.querySelectorAll('a-camera');
+                    cameras.forEach(camera => camera.setAttribute('active', 'false'));
+
+                    // Desativa a classe ativa de todos os botões
+                    const buttons = document.querySelectorAll('.cloud-button');
+                    buttons.forEach(button => button.classList.remove('active-camera'));
+
+                    // Ativa a câmera selecionada
+                    const selectedCamera = document.getElementById(cameraId);
+                    if (selectedCamera) {
+                        selectedCamera.setAttribute('active', 'true');
+                    } else {
+                        console.error(`Câmera com ID ${cameraId} não encontrada.`);
+                    }
+
+                    const buttonId = `button-${cameraId}`;
+                    const selectedButton = document.getElementById(buttonId);
+                    if (selectedButton) {
+                        selectedButton.classList.add('active-camera');
+                    }
+                }
+
+                function resetCameras() {
+                    const initialCameraStates = {
+                        camTopOfTab: { position: "50 30 10", rotation: "-45 90 0" },
+                        camBottomOfPieces: { position: "50 -60 10", rotation: "45 90 0" },
+                        camTopOfScene: { position: "40 90 10", rotation: "-90 0 0" },
+                        camDiagonalFrontOfScene: { position: "90 30 90", rotation: "-30 45 0" },
+                        camSideOfScene: { position: "30 -15 100", rotation: "0 -10 0" },
+                        camDiagonalBackOfScene: { position: "-60 30 -50", rotation: "-40 -120 0" },
+                    };
+
+                    // Itera sobre os IDs das câmeras e redefine suas propriedades
+                    for (const [cameraId, state] of Object.entries(initialCameraStates)) {
+                        const camera = document.getElementById(cameraId);
+                        if (camera) {
+                            camera.setAttribute('position', state.position);
+                            camera.setAttribute('rotation', state.rotation);
+                            camera.setAttribute('active', 'false'); // Desativa todas as câmeras
+                        } else {
+                            console.error(`Câmera com ID ${cameraId} não encontrada.`);
+                        }
+                    }
+                }
+
+                function getRandomInRange(min, max) {
+                    return Math.random() * (max - min) + min;
+                }
+    
+                function isPositionOccupied(position, existingPositions, radius = 0.5) {
+                    return existingPositions.some(existing => {
+                        const distance = Math.sqrt(
+                            Math.pow(position.x - existing.x, 0.5) +
+                            Math.pow(position.y - existing.y, 0.5) +
+                            Math.pow(position.z - existing.z, 0.5)
+                        );
+                        return distance < radius * 1; 
+                    });
+                }
+    
+                function createPieceWithRandomPosition(range, existingPositions) {
+                    let position;
+                    let attempts = 0;
+                    do {
+                        position = {
+                            x: getRandomInRange(range.x[0], range.x[1]),
+                            y: getRandomInRange(range.y[0], range.y[1]),
+                            z: getRandomInRange(range.z[0], range.z[1])
+                        };
+                        attempts++;
+                        if (attempts > 100) {
+                            throw new Error("Não foi possível encontrar uma posição disponível.");
+                        }
+                    } while (isPositionOccupied(position, existingPositions));
+    
+                    const piece = document.createElement("a-entity");
+                    const sphere = document.createElement("a-sphere");
+    
+                    const color = Math.random() < 0.5 ? "black" : "white";
+    
+                    const rotationY = getRandomInRange(range.r[0], range.r[1]);
+    
+                    sphere.setAttribute("radius", "0.5");
+                    sphere.setAttribute("scale", "1 0.5 1");
+                    sphere.setAttribute("color", color);
+    
+                    piece.setAttribute("position", `${position.x} ${position.y} ${position.z}`);
+                    piece.setAttribute("rotation", `0 ${rotationY} -45`);
+                    piece.appendChild(sphere);
+    
+                    existingPositions.push(position); 
+    
+                    return piece;
+                }
+    
+                function createMultiplePiecesInRange(range, count) {
+                    const pieces = [];
+                    const existingPositions = []; 
+                    for (let i = 0; i < count; i++) {
+                        const piece = createPieceWithRandomPosition(range, existingPositions);
+                        pieces.push(piece);
+                    }
+                    return pieces;
+                }
+    
+                const faixa1Range = { x: [39, 39.5], y: [-5, -7], z: [8, 10], r:[-90, 90] };
+                const faixa2Range = { x: [41.5, 42.5], y: [-8, -11], z: [7, 11], r:[-90, 90] };
+                const faixa3Range = { x: [43.5, 44.5], y: [-13, -22], z: [5, 13], r:[-90, 90] };
+                const faixa4Range = { x: [43.5, 44.5], y: [-24, -32], z: [4, 14], r:[-90, 90] };
+                const faixa5Range = { x: [43.5, 44.5], y: [-36, -44], z: [4, 14], r:[-90, 90] };
+                const faixa6Range = { x: [27, 53], y: [-59.5, -60], z: [-9, 23], r:[-0.1, 0.1] };
+    
+                const scene = document.querySelector("a-scene");
+    
+                const faixa1Pieces = createMultiplePiecesInRange(faixa1Range, 5);
+                faixa1Pieces.forEach(piece => scene.appendChild(piece));
+    
+                const faixa2Pieces = createMultiplePiecesInRange(faixa2Range, 10);
+                faixa2Pieces.forEach(piece => scene.appendChild(piece));
+    
+                const faixa3Pieces = createMultiplePiecesInRange(faixa3Range, 7);
+                faixa3Pieces.forEach(piece => scene.appendChild(piece));
+    
+                const faixa4Pieces = createMultiplePiecesInRange(faixa4Range, 13);
+                faixa4Pieces.forEach(piece => scene.appendChild(piece));
+    
+                const faixa5Pieces = createMultiplePiecesInRange(faixa5Range, 17);
+                faixa5Pieces.forEach(piece => scene.appendChild(piece));
+
+                const faixa6Pieces = createMultiplePiecesInRange(faixa6Range, 308);
+                faixa6Pieces.forEach(piece => scene.appendChild(piece));
+    
+                let s = 17.1;
+                let e = 15.0;
+                for (let z = 0; z < 19; z++) {
+                    let lineY = document.createElement('a-entity');
+        
+                    let startY = `0 5 ${z}`;
+                    let endY = `18 5 ${z}`;
+                    
+                    lineY.setAttribute('line', `start: ${startY}; end: ${endY}; color: #000000;`);
+                    lineY.setAttribute('rotation', `0 0 -45`);
+                    lineY.setAttribute('position', `13.5 11.5 0`);
+        
+                    document.querySelector('a-scene').appendChild(lineY);
+        
+                    var textY = document.createElement('a-text');
+                    textY.setAttribute('value', z+1);
+                    textY.setAttribute('position', `30.1 2 ${z}`);
+                    textY.setAttribute('rotation', '-45 90 -90');
+                    textY.setAttribute('side', 'double');
+                    textY.setAttribute('color', '#000'); 
+                    textY.setAttribute('align', 'center');
+                    textY.setAttribute('width', '6');
+                    textY.setAttribute('scale', '2 2 2');
+                    
+        
+                    document.querySelector('a-scene').appendChild(textY);
+        
+                    let lineX = document.createElement('a-entity');
+        
+                    let startX = `${z} 5 0`;
+                    let endX = `${z} 5 18`;
+
+                    lineX.setAttribute('line', `start: ${startX}; end: ${endX}; color: #b87333`);
+                    lineX.setAttribute('rotation', `0 0 -45`);
+                    lineX.setAttribute('position', `13.5 11.5 0`);
+        
+                    document.querySelector('a-scene').appendChild(lineX);
+        
+                    var textX = document.createElement('a-text');
+
+                    
+                    textX.setAttribute('value', String.fromCharCode(65+z));
+
+                    textX.setAttribute('position', `${s} ${e} 18.4`);
+        
+                    textX.setAttribute('rotation', '-45 90 -90');
+                    textX.setAttribute('side', 'double');
+        
+                    textX.setAttribute('color', '#b87333'); 
+                    textX.setAttribute('align', 'center');
+                    textX.setAttribute('width', '6');
+                    textX.setAttribute('scale', '2 2 2');
+        
+                    document.querySelector('a-scene').appendChild(textX);
+                    s = s + 0.7;
+                    e = e - 0.7;
+                }
+            </script>
+            <footer>
+                The Falling Go
+            </footer>
+      </body>
+</html>
